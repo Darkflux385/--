@@ -208,9 +208,6 @@ footer button {
   <footer>
     <nav aria-label="Informations légales">
       <button data-ouvre="modal-legal" data-onglet="confidentialite">Confidentialité</button>
-      <button data-ouvre="modal-legal" data-onglet="conditions">Conditions</button>
-      <button data-ouvre="modal-legal" data-onglet="accessibilite">Accessibilité</button>
-      <button data-ouvre="modal-legal" data-onglet="securite">Sécurité</button>
       <button data-ouvre="modal-admin">🔒 Admin</button>
     </nav>
   </footer>
@@ -272,9 +269,6 @@ footer button {
 
       <div class="onglets" role="tablist" aria-label="Rubriques légales">
         <button class="onglet actif" role="tab" aria-selected="true" aria-controls="confidentialite" data-cible="confidentialite">Confidentialité</button>
-        <button class="onglet" role="tab" aria-selected="false" aria-controls="conditions" data-cible="conditions" tabindex="-1">Conditions</button>
-        <button class="onglet" role="tab" aria-selected="false" aria-controls="accessibilite" data-cible="accessibilite" tabindex="-1">Accessibilité</button>
-        <button class="onglet" role="tab" aria-selected="false" aria-controls="securite" data-cible="securite" tabindex="-1">Sécurité</button>
       </div>
 
       <!-- Confidentialité -->
@@ -291,45 +285,6 @@ footer button {
         </ul>
         <h4>Combien de temps ?</h4>
         <p>Jusqu’à ta désinscription, ou au plus tard 12 mois après la sortie du site.</p>
-
-      <!-- Conditions -->
-      <div id="conditions" class="contenu texte" role="tabpanel" hidden>
-        <h3>Conditions générales d’utilisation</h3>
-        <p><em>Dernière mise à jour : 19 novembre 2026</em></p>
-        <h4>Éditeur</h4>
-        <p>Ce site est une page d’attente gratuite. Il présente un projet à venir et permet de s’inscrire à une alerte e-mail. En l’utilisant, tu acceptes ces conditions.</p>
-        <h4>Propriété intellectuelle</h4>
-        <p>Les textes, le nom du projet et l’identité visuelle du site sont protégés. Toute reproduction sans accord est interdite.</p>
-        <h4>Responsabilité</h4>
-        <p>Le site est fourni « en l’état », sans garantie de disponibilité en continu. Son contenu peut changer à tout moment, et la date de sortie du projet n’est pas garantie. Je ne suis pas responsable des contenus des sites externes vers lesquels il pourrait renvoyer.</p>
-        <h4>Utilisation correcte</h4>
-        <p>Il est interdit de tenter de perturber le site, d’inscrire l’adresse e-mail d’une autre personne sans son accord, ou d’utiliser le formulaire à des fins abusives.</p>
-        <h4>Droit applicable</h4>
-        <p>Droit français. Ces conditions peuvent être modifiées ; la date de mise à jour fait foi.</p>
-      </div>
-
-      <!-- Accessibilité -->
-      <div id="accessibilite" class="contenu texte" role="tabpanel" hidden>
-        <h3>Accessibilité</h3>
-        <p>Je veux que ce site soit utilisable par le plus grand nombre. Il n’a pas fait l’objet d’un audit officiel, mais voici ce qui est en place :</p>
-        <ul>
-          <li>Navigation complète au clavier (Tab, Entrée, flèches pour les onglets, Échap pour fermer une fenêtre).</li>
-          <li>Focus visible sur les éléments interactifs, fenêtres gérées pour les lecteurs d’écran.</li>
-          <li>Champs de formulaire étiquetés, page en français, structure avec titres.</li>
-          <li>Animations (fond, confettis, pulsation) désactivées si ton appareil demande de réduire les animations.</li>
-          <li>Affichage adapté au mobile et au zoom.</li>
-        </ul>
-        <p><strong>Limite connue :</strong> le fond change de couleurs en continu, et le contraste du texte blanc peut être plus faible sur certaines teintes claires.</p>
-      </div>
-
-      <!-- Sécurité -->
-      <div id="securite" class="contenu texte" role="tabpanel" hidden>
-        <h3>Sécurité</h3>
-        <ul>
-          <li>Le site est servi en HTTPS.</li>
-          <li>Aucun script ni ressource d’un tiers n’est chargé ; une politique de sécurité (CSP) limite ce que la page peut charger.</li>
-          <li>Aucun cookie, aucun traceur.</li>
-        </ul>
       </div>
     </div>
   </div>
