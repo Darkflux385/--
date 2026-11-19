@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src https://api.buttondown.com; form-action https://buttondown.com; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Un projet se prépare… Ça arrive bientôt.">
+<title>SOON</title>
+<style>
+html, body { height: 100%; margin: 0; }
+body {
+  display: flex; align-items: center; justify-content: center;
+  box-sizing: border-box;
+  padding: env(safe-area-inset-top, 0px) 16px env(safe-area-inset-bottom, 0px);
+  background: linear-gradient(120deg, #ff0080, #ff8c00, #40e0d0, #7928ca, #0070f3, #ff0080);
+  background-size: 400% 400%;
+  animation: bg 12s ease infinite;
+  overflow: hidden;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+main { display: flex; flex-direction: column; align-items: center; gap: 3vh; }
+h1 {
+  margin: 0;
+  font-size: clamp(3rem, 18vw, 16rem);
+  font-weight: 900; letter-spacing: .02em; color: #fff;
+  text-shadow: 0 8px 40px rgba(0,0,0,.35);
+  animation: pulse 2s ease-in-out infinite;
+}
+main > p {
+  margin: 0; text-align: center;
+  font-size: clamp(1rem, 3vw, 2rem);
+  font-weight: 600; letter-spacing: .15em; text-transform: uppercase;
+  color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,.35);
+}
+
+/* Accessibilité */
+:focus-visible { outline: 3px solid #111; outline-offset: 2px; box-shadow: 0 0 0 5px #fff; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* Bouton Infos */
+#info-btn {
+  position: relative;
+  padding: 16px 34px; border: 2px solid rgba(255,255,255,.9); border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255,255,255,.35), rgba(255,255,255,.08));
+  color: #fff; overflow: hidden;
+  font-size: 1.1rem; font-weight: 700; letter-spacing: .04em; cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 30px rgba(0,0,0,.25);
+  text-shadow: 0 2px 8px rgba(0,0,0,.3);
+  animation: flotte 3s ease-in-out infinite, halo 2.4s ease-out infinite;
+  transition: transform .2s, background .2s;
+}
+#info-btn::after {
+  content: ""; position: absolute; top: 0; left: -80%;
+  width: 50%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+  transform: skewX(-20deg);
+  animation: reflet 3.5s ease-in-out infinite;
+}
+#info-btn:hover { transform: scale(1.08); background: linear-gradient(135deg, rgba(255,255,255,.5), rgba(255,255,255,.15)); }
+#info-btn:active { transform: scale(.95); }
+#info-btn.clic { animation: rebond .5s ease; }
+.particule { position: fixed; width: 10px; height: 10px; border-radius: 50%; pointer-events: none; z-index: 20; }
+
+/* Liens légaux en bas */
+footer {
+  position: fixed; left: 0; right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  display: flex; justify-content: center; padding: 0 12px;
+}
+footer nav {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px;
+  padding: 8px 16px; border-radius: 16px; background: rgba(0,0,0,.4);
+}
+footer button {
+  padding: 4px 2px; border: 0; background: none; color: #fff;
+  font-size: .85rem; text-decoration: underline; cursor: pointer;
+}
+
+/* Fenêtres */
+.modal {
+  position: fixed; inset: 0; z-index: 10;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px; background: rgba(0,0,0,.55);
+}
+.modal.ouvert { display: flex; }
+.modal.ouvert .boite { animation: apparition .35s cubic-bezier(.2, 1.2, .4, 1); }
+.modal.sortie { animation: fondu .3s ease forwards; }
+.modal.sortie .boite { animation: disparition .3s ease-in forwards; }
+.boite {
+  position: relative; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto;
+  box-sizing: border-box; background: #fff; color: #222; border-radius: 20px;
+  padding: 28px 24px 24px; box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.boite.large { max-width: 600px; }
+.boite h2 { margin: 0 0 16px; font-size: 1.5rem; padding-right: 40px; }
+.fermer {
+  position: absolute; top: 12px; right: 12px;
+  width: 36px; height: 36px; border: 0; border-radius: 50%;
+  background: #eee; color: #222; font-size: 1rem; cursor: pointer;
+}
+.onglets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.onglet {
+  flex: 1 1 auto; padding: 10px; border: 0; border-radius: 10px;
+  background: #eee; color: #222; font-weight: 600; font-size: .9rem; cursor: pointer;
+}
+.onglet.actif { background: #7928ca; color: #fff; }
+.contenu { line-height: 1.5; font-size: 1rem; }
+.texte { font-size: .92rem; }
+.texte h3 { margin: 0 0 4px; font-size: 1.15rem; }
+.texte h4 { margin: 16px 0 4px; font-size: 1rem; }
+.texte p { margin: 4px 0; }
+.texte ul { margin: 4px 0; padding-left: 20px; }
+.todo { background: #fff3b0; padding: 0 3px; border-radius: 3px; }
+
+/* Formulaire e-mail */
+.newsletter-form { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+.newsletter-input {
+  padding: 12px 16px; border: 2px solid #ddd; border-radius: 10px;
+  font-size: 1rem; outline: none; transition: border-color .2s;
+}
+.newsletter-input:focus { border-color: #7928ca; }
+.consentement { display: flex; gap: 8px; align-items: flex-start; font-size: .85rem; line-height: 1.4; }
+.consentement input { margin-top: 3px; flex: none; width: 18px; height: 18px; }
+.lien {
+  padding: 0; border: 0; background: none; color: #621fa7;
+  font: inherit; text-decoration: underline; cursor: pointer;
+}
+.newsletter-btn {
+  padding: 12px 16px; border: none; border-radius: 10px;
+  background: #7928ca; color: #fff; font-weight: 600; font-size: 1rem;
+  cursor: pointer; transition: background .2s;
+}
+.newsletter-btn:hover { background: #621fa7; }
+.newsletter-note { display: block; margin-top: 10px; color: #666; font-size: .8rem; line-height: 1.3; }
+
+/* Animations */
+@keyframes bg { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes pulse { 0%, 100% { transform: scale(.85); } 50% { transform: scale(1.1); } }
+@keyframes flotte { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+@keyframes halo {
+  0% { box-shadow: 0 8px 30px rgba(0,0,0,.25), 0 0 0 0 rgba(255,255,255,.5); }
+  100% { box-shadow: 0 8px 30px rgba(0,0,0,.25), 0 0 0 20px rgba(255,255,255,0); }
+}
+@keyframes reflet { 0%, 60% { left: -80%; } 100% { left: 140%; } }
+@keyframes rebond { 0% { transform: scale(1); } 30% { transform: scale(.85); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes apparition { from { opacity: 0; transform: scale(.8) translateY(20px); } to { opacity: 1; transform: none; } }
+@keyframes fondu { to { opacity: 0; } }
+@keyframes disparition { to { opacity: 0; transform: scale(.7) translateY(40px) rotate(-3deg); } }
+
+/* ===== Panneau admin (verre dépoli sur le fond animé) ===== */
+#modal-admin { background: rgba(0,0,0,.3); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.boite.admin {
+  background: rgba(20,20,30,.62); color: #fff; border: 1px solid rgba(255,255,255,.2);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+}
+.admin .fermer { background: rgba(255,255,255,.18); color: #fff; }
+.admin h3 { margin: 22px 0 8px; font-size: 1.05rem; color: #ffb86b; }
+.admin .sous { margin: 0; color: #c7c7d4; font-size: .85rem; line-height: 1.4; }
+.admin label { display: block; margin: 12px 0 6px; font-size: .85rem; color: #d6d6e2; }
+.admin input[type=password], .admin input[type=text], .admin input[type=search], .admin textarea {
+  width: 100%; box-sizing: border-box; padding: 11px 12px; border-radius: 10px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22);
+  color: #fff; font: inherit; font-size: .95rem;
+}
+.admin textarea { min-height: 140px; resize: vertical; }
+.admin input[type=search] { margin-top: 10px; }
+.admin .ligne { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.admin button:not(.fermer), .admin .bouton {
+  flex: 1 1 auto; padding: 11px 14px; border: 0; border-radius: 10px;
+  background: rgba(255,255,255,.16); color: #fff; font: inherit; font-weight: 700;
+  text-align: center; text-decoration: none; cursor: pointer;
+}
+.admin button:disabled { opacity: .5; cursor: wait; }
+.admin .vif { background: linear-gradient(135deg, #7928ca, #0070f3) !important; }
+.admin .danger { background: linear-gradient(135deg, #ff0080, #ff8c00) !important; }
+.admin .msg { margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-size: .88rem; line-height: 1.4; }
+.admin .msg:empty { display: none; }
+.admin .msg.ok { background: rgba(74,222,128,.18); color: #86efac; }
+.admin .msg.err { background: rgba(248,113,113,.18); color: #fca5a5; }
+.admin .nombre { font-size: 2.4rem; font-weight: 900; line-height: 1; }
+.admin .liste { margin-top: 10px; max-height: 240px; overflow: auto; border-radius: 10px; background: rgba(0,0,0,.28); }
+.admin .liste table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.admin .liste th, .admin .liste td { padding: 8px 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.08); word-break: break-all; }
+.admin .liste th { position: sticky; top: 0; background: #1b1b28; color: #c7c7d4; }
+.admin .alerte { margin-top: 14px; padding: 10px 12px; border-left: 3px solid #ff8c00; background: rgba(255,140,0,.12); border-radius: 6px; font-size: .8rem; line-height: 1.4; color: #ffd9a8; }
+
+.admin .porte { margin-top: 8px; }
+.admin .porte[hidden], .admin [hidden] { display: none; }
+
+/* Respect du réglage « réduire les animations » */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+  <main>
+    <h1>SOON</h1>
+    <button id="info-btn" data-ouvre="modal-infos">ℹ️ Infos</button>
+    <p>Ça arrive bientôt</p>
+  </main>
+
+  <footer>
+    <nav aria-label="Informations légales">
+      <button data-ouvre="modal-legal" data-onglet="confidentialite">Confidentialité</button>
+      <button data-ouvre="modal-legal" data-onglet="conditions">Conditions</button>
+      <button data-ouvre="modal-legal" data-onglet="accessibilite">Accessibilité</button>
+      <button data-ouvre="modal-legal" data-onglet="securite">Sécurité</button>
+      <button data-ouvre="modal-admin">🔒 Admin</button>
+    </nav>
+  </footer>
+
+  <!-- ========== INFOS ========== -->
+  <div class="modal" id="modal-infos" role="dialog" aria-modal="true" aria-labelledby="titre-infos">
+    <div class="boite">
+      <button class="fermer" aria-label="Fermer">✕</button>
+      <h2 id="titre-infos">Infos</h2>
+
+      <div class="onglets" role="tablist" aria-label="Rubriques">
+        <button class="onglet actif" role="tab" aria-selected="true" aria-controls="projet" data-cible="projet">Le projet</button>
+        <button class="onglet" role="tab" aria-selected="false" aria-controls="createur" data-cible="createur" tabindex="-1">Le créateur</button>
+        <button class="onglet" role="tab" aria-selected="false" aria-controls="prevenir" data-cible="prevenir" tabindex="-1">Préviens-moi</button>
+      </div>
+
+      <div id="projet" class="contenu" role="tabpanel">
+        <strong>🤫 Top secret…</strong><br>
+        Un projet se prépare dans l’ombre.<br>
+        Un petit carré noir et blanc, mais plein de surprises cachées : un lien, un profil, une connexion…<br>
+        <em>Un seul scan suffit.</em><br>
+        Tu as une idée ? Réponse très bientôt. 👀
+      </div>
+
+      <div id="createur" class="contenu" role="tabpanel" hidden>
+        <strong>Darflux</strong><br>
+        Salut, moi c’est Darflux ! 👋<br>
+        J’adore créer des projets, imaginer des choses et les voir prendre vie.<br>
+        Celui-ci me tient particulièrement à cœur : j’avais vraiment envie de le faire, et je mets tout ce que j’ai dedans.<br>
+        Merci d’être passé, ça veut dire beaucoup. Reste dans le coin, la suite arrive. 🚀
+      </div>
+
+      <div id="prevenir" class="contenu" role="tabpanel" hidden>
+        <strong>Restez informés 🚀</strong><br>
+        Laisse ton adresse e-mail pour recevoir une alerte dès que le site sera en ligne !
+
+        <!-- 👇 REMPLACE VOTRE_PSEUDO_BUTTONDOWN (1 seule fois) par ton pseudo Buttondown -->
+        <form class="newsletter-form" action="https://buttondown.com/api/emails/embed-subscribe/VOTRE_PSEUDO_BUTTONDOWN" method="post" target="_blank">
+          <label for="email" class="sr-only">Adresse e-mail</label>
+          <input type="email" id="email" name="email" class="newsletter-input" placeholder="ton.email@exemple.com" autocomplete="email" required>
+          <input type="hidden" value="1" name="embed">
+          <label class="consentement">
+            <input type="checkbox" required>
+            <span>J’accepte de recevoir une alerte à la sortie du site et j’ai lu la
+              <button type="button" class="lien" data-ouvre="modal-legal" data-onglet="confidentialite">politique de confidentialité</button>.</span>
+          </label>
+          <button type="submit" class="newsletter-btn">M’inscrire</button>
+        </form>
+        <small class="newsletter-note">Ton adresse sert uniquement à te prévenir de la sortie du site. Désinscription possible à tout moment.</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== LÉGAL ========== -->
+  <div class="modal" id="modal-legal" role="dialog" aria-modal="true" aria-labelledby="titre-legal">
+    <div class="boite large">
+      <button class="fermer" aria-label="Fermer">✕</button>
+      <h2 id="titre-legal">Informations légales</h2>
+
+      <div class="onglets" role="tablist" aria-label="Rubriques légales">
+        <button class="onglet actif" role="tab" aria-selected="true" aria-controls="confidentialite" data-cible="confidentialite">Confidentialité</button>
+        <button class="onglet" role="tab" aria-selected="false" aria-controls="conditions" data-cible="conditions" tabindex="-1">Conditions</button>
+        <button class="onglet" role="tab" aria-selected="false" aria-controls="accessibilite" data-cible="accessibilite" tabindex="-1">Accessibilité</button>
+        <button class="onglet" role="tab" aria-selected="false" aria-controls="securite" data-cible="securite" tabindex="-1">Sécurité</button>
+      </div>
+
+      <!-- Confidentialité -->
+      <div id="confidentialite" class="contenu texte" role="tabpanel">
+        <h3>Politique de confidentialité</h3>
+        <p><em>Dernière mise à jour : 19 novembre 2026</em></p>
+        <h4>Qui est responsable ?</h4>
+        <p>Darflux, éditeur du site. Contact : <span class="todo">[ton e-mail de contact]</span>.</p>
+        <h4>Quelles données ?</h4>
+        <p>Une seule : ton <strong>adresse e-mail</strong>, uniquement si tu remplis le formulaire « Préviens-moi ». Le site n’utilise ni compte, ni cookie, ni outil de statistiques, ni police ou script externe.</p>
+        <h4>Pourquoi ?</h4>
+        <p>Pour t’envoyer une alerte quand le site sort. Base légale : ton <strong>consentement</strong> (case à cocher).</p>
+        <h4>Qui reçoit ces données ?</h4>
+        <ul>
+          <li><strong>Buttondown</strong> (États-Unis) : service qui stocke ton e-mail et envoie les messages. Un transfert hors Union européenne est donc possible.</li>
+          <li><strong>GitHub Pages</strong> (GitHub, États-Unis) : héberge le site et peut enregistrer des données techniques de connexion (adresse IP) comme tout hébergeur.</li>
+        </ul>
+        <h4>Combien de temps ?</h4>
+        <p>Jusqu’à ta désinscription, ou au plus tard 12 mois après la sortie du site.</p>
+        <h4>Tes droits</h4>
+        <p>Tu peux demander l’accès, la rectification ou l’effacement de ton adresse, retirer ton consentement, ou t’opposer au traitement : écris-moi, ou clique sur le lien de désinscription présent dans chaque e-mail. Tu peux aussi saisir la CNIL (cnil.fr).</p>
+        <h4>Moins de 15 ans ?</h4>
+        <p>Demande l’accord d’un parent avant de t’inscrire.</p>
+      </div>
+
+      <!-- Conditions -->
+      <div id="conditions" class="contenu texte" role="tabpanel" hidden>
+        <h3>Conditions générales d’utilisation</h3>
+        <p><em>Dernière mise à jour : 19 novembre 2026</em></p>
+        <h4>Éditeur</h4>
+        <p>Darflux — <span class="todo">[ton e-mail de contact]</span>.</p>
+        <h4>Hébergeur</h4>
+        <p>GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
+        <h4>Objet</h4>
+        <p>Ce site est une page d’attente gratuite. Il présente un projet à venir et permet de s’inscrire à une alerte e-mail. En l’utilisant, tu acceptes ces conditions.</p>
+        <h4>Propriété intellectuelle</h4>
+        <p>Les textes, le nom du projet et l’identité visuelle du site sont protégés. Toute reproduction sans accord est interdite.</p>
+        <h4>Responsabilité</h4>
+        <p>Le site est fourni « en l’état », sans garantie de disponibilité en continu. Son contenu peut changer à tout moment, et la date de sortie du projet n’est pas garantie. Je ne suis pas responsable des contenus des sites externes vers lesquels il pourrait renvoyer.</p>
+        <h4>Utilisation correcte</h4>
+        <p>Il est interdit de tenter de perturber le site, d’inscrire l’adresse e-mail d’une autre personne sans son accord, ou d’utiliser le formulaire à des fins abusives.</p>
+        <h4>Droit applicable</h4>
+        <p>Droit français. Ces conditions peuvent être modifiées ; la date de mise à jour fait foi.</p>
+      </div>
+
+      <!-- Accessibilité -->
+      <div id="accessibilite" class="contenu texte" role="tabpanel" hidden>
+        <h3>Accessibilité</h3>
+        <p>Je veux que ce site soit utilisable par le plus grand nombre. Il n’a pas fait l’objet d’un audit officiel, mais voici ce qui est en place :</p>
+        <ul>
+          <li>Navigation complète au clavier (Tab, Entrée, flèches pour les onglets, Échap pour fermer une fenêtre).</li>
+          <li>Focus visible sur les éléments interactifs, fenêtres gérées pour les lecteurs d’écran.</li>
+          <li>Champs de formulaire étiquetés, page en français, structure avec titres.</li>
+          <li>Animations (fond, confettis, pulsation) désactivées si ton appareil demande de réduire les animations.</li>
+          <li>Affichage adapté au mobile et au zoom.</li>
+        </ul>
+        <p><strong>Limite connue :</strong> le fond change de couleurs en continu, et le contraste du texte blanc peut être plus faible sur certaines teintes claires.</p>
+        <p>Un problème ? Écris-moi à <span class="todo">[ton e-mail de contact]</span>, je corrigerai.</p>
+      </div>
+
+      <!-- Sécurité -->
+      <div id="securite" class="contenu texte" role="tabpanel" hidden>
+        <h3>Sécurité</h3>
+        <ul>
+          <li>Le site est servi en HTTPS.</li>
+          <li>Aucun compte, aucun mot de passe, aucune base de données sur ce site : ton e-mail est envoyé directement à Buttondown en connexion chiffrée.</li>
+          <li>Aucun script ni ressource d’un tiers n’est chargé ; une politique de sécurité (CSP) limite ce que la page peut charger.</li>
+          <li>Aucun cookie, aucun traceur.</li>
+        </ul>
+        <p>Tu as repéré une faille ? Préviens-moi à <span class="todo">[ton e-mail de contact]</span> avant de la rendre publique. Merci !</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ADMIN (s'ouvre avec  tonsite/#admin , aucun lien visible) ========== -->
+  <div class="modal" id="modal-admin" role="dialog" aria-modal="true" aria-labelledby="titre-admin">
+    <div class="boite large admin">
+      <button class="fermer" aria-label="Fermer">✕</button>
+      <h2 id="titre-admin">🛠️ Admin</h2>
+      <p class="sous">Sans ta clé API Buttondown, ce panneau ne fait rien.</p>
+
+      <form id="a-porte" class="porte" autocomplete="off">
+        <label for="a-code">Code d’accès</label>
+        <input id="a-code" type="password" autocomplete="off" placeholder="Entre ton code">
+        <div class="ligne"><button type="submit" class="vif">Entrer</button></div>
+        <div id="a-msg-code" class="msg" role="status"></div>
+      </form>
+
+      <div id="a-contenu" hidden>
+      <h3>1. Connexion</h3>
+      <label for="a-cle">Clé API Buttondown <span class="sous">(Buttondown → Settings → API)</span></label>
+      <input id="a-cle" type="password" autocomplete="off" placeholder="Colle ta clé ici">
+      <div class="ligne">
+        <button type="button" id="a-connexion" class="vif">Se connecter</button>
+        <button type="button" id="a-oublier">Oublier la clé</button>
+        <a class="bouton" href="https://buttondown.com" target="_blank" rel="noopener noreferrer">Ouvrir Buttondown</a>
+      </div>
+      <div id="a-msg-connexion" class="msg" role="status"></div>
+
+      <div id="a-zone" hidden>
+        <h3>2. Inscrits</h3>
+        <div class="nombre" id="a-nombre">–</div>
+        <p class="sous">adresses enregistrées</p>
+        <div class="ligne"><button type="button" id="a-liste-btn">Afficher / actualiser la liste</button></div>
+        <label for="a-recherche" class="sr-only">Filtrer la liste</label>
+        <input id="a-recherche" type="search" placeholder="Filtrer par e-mail…" hidden>
+        <div class="liste" id="a-liste" hidden></div>
+        <div id="a-msg-liste" class="msg" role="status"></div>
+
+        <h3>3. Écrire un e-mail à tous</h3>
+        <label for="a-sujet">Objet</label>
+        <input id="a-sujet" type="text" maxlength="200" placeholder="Le site est enfin en ligne ! 🚀">
+        <label for="a-corps">Message <span class="sous">(Markdown accepté)</span></label>
+        <textarea id="a-corps" placeholder="Salut ! C’est Darflux…"></textarea>
+        <div class="ligne">
+          <button type="button" id="a-brouillon" class="vif">Enregistrer en brouillon</button>
+          <button type="button" id="a-envoyer" class="danger">Envoyer à tous</button>
+        </div>
+        <div id="a-msg-envoi" class="msg" role="status"></div>
+        <div class="alerte">💡 Fais d’abord un <strong>brouillon</strong>, relis-le dans Buttondown (menu Emails), puis envoie. Un envoi ne peut pas être annulé.</div>
+      </div>
+              <h3>4. Changer le code d’accès</h3>
+        <label for="a-nouveau">Nouveau code <span class="sous">(8 caractères minimum)</span></label>
+        <input id="a-nouveau" type="password" autocomplete="new-password" maxlength="64">
+        <label for="a-confirme">Confirmer le nouveau code</label>
+        <input id="a-confirme" type="password" autocomplete="new-password" maxlength="64">
+        <div class="ligne">
+          <button type="button" id="a-changer" class="vif">Changer le code</button>
+          <button type="button" id="a-reinit">Revenir au code d’origine</button>
+        </div>
+        <div id="a-msg-changer" class="msg" role="status"></div>
+        <p class="sous">Le nouveau code est gardé dans ce navigateur et reste tant que tu n’effaces pas les données du site. Sur un autre appareil, c’est le code d’origine qui marche.</p>
+        <div class="alerte">🔒 La clé reste dans ce navigateur seulement. Clique « Oublier la clé » si tu n’es pas sur ton propre appareil.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+const $$ = (sel, racine = document) => [...racine.querySelectorAll(sel)];
+const reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let dernier = null; // élément à refocaliser à la fermeture
+
+const ouvert = () => document.querySelector(".modal.ouvert");
+
+function choisir(modal, cible, focus = false) {
+  $$(".onglet", modal).forEach((o) => {
+    const actif = o.dataset.cible === cible;
+    o.classList.toggle("actif", actif);
+    o.setAttribute("aria-selected", actif);
+    o.tabIndex = actif ? 0 : -1;
+    if (actif && focus) o.focus();
+  });
+  $$(".contenu", modal).forEach((c) => (c.hidden = c.id !== cible));
+}
+
+function ouvrir(id, onglet) {
+  const actuel = ouvert();
+  if (actuel) actuel.classList.remove("ouvert", "sortie");
+  const modal = document.getElementById(id);
+  modal.classList.remove("sortie");
+  modal.classList.add("ouvert");
+  if (onglet) choisir(modal, onglet);
+  modal.querySelector(".fermer").focus();
+}
+
+function fermer() {
+  const modal = ouvert();
+  if (!modal || modal.classList.contains("sortie")) return;
+  modal.classList.add("sortie");
+  setTimeout(() => {
+    modal.classList.remove("ouvert", "sortie");
+    if (dernier) dernier.focus();
+  }, reduit ? 0 : 300);
+}
+
+function confettis(btn) {
+  btn.classList.remove("clic");
+  void btn.offsetWidth;
+  btn.classList.add("clic");
+  const r = btn.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const couleurs = ["#ff0080", "#ff8c00", "#40e0d0", "#ffffff", "#ffe600"];
+  const nb = 18;
+  for (let i = 0; i < nb; i++) {
+    const p = document.createElement("span");
+    p.className = "particule";
+    p.setAttribute("aria-hidden", "true");
+    p.style.left = cx - 5 + "px";
+    p.style.top = cy - 5 + "px";
+    p.style.background = couleurs[i % couleurs.length];
+    document.body.appendChild(p);
+    const angle = (Math.PI * 2 * i) / nb;
+    const dist = 70 + Math.random() * 60;
+    p.animate(
+      [
+        { transform: "translate(0, 0) scale(1)", opacity: 1 },
+        { transform: `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px) scale(0)`, opacity: 0 }
+      ],
+      { duration: 700, easing: "ease-out" }
+    ).onfinish = () => p.remove();
+  }
+}
+
+// Boutons qui ouvrent une fenêtre
+$$("[data-ouvre]").forEach((el) => {
+  el.addEventListener("click", () => {
+    if (!ouvert()) dernier = el;
+    const aller = () => ouvrir(el.dataset.ouvre, el.dataset.onglet);
+    if (el.id === "info-btn" && !reduit) {
+      confettis(el);
+      setTimeout(aller, 350);
+    } else {
+      aller();
+    }
+  });
+});
+
+document.getElementById("info-btn").addEventListener("animationend", (e) => {
+  if (e.animationName === "rebond") e.currentTarget.classList.remove("clic");
+});
+
+// Fermeture : croix, clic en dehors
+$$(".modal").forEach((modal) => {
+  modal.querySelector(".fermer").addEventListener("click", fermer);
+  modal.addEventListener("click", (e) => { if (e.target === modal) fermer(); });
+  // Onglets : clic + flèches
+  $$(".onglet", modal).forEach((onglet) => {
+    onglet.addEventListener("click", () => choisir(modal, onglet.dataset.cible));
+    onglet.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const liste = $$(".onglet", modal);
+      const i = liste.indexOf(onglet);
+      const suivant = liste[(i + (e.key === "ArrowRight" ? 1 : liste.length - 1)) % liste.length];
+      choisir(modal, suivant.dataset.cible, true);
+    });
+  });
+});
+
+// Échap + piège du focus dans la fenêtre ouverte
+document.addEventListener("keydown", (e) => {
+  const modal = ouvert();
+  if (!modal) return;
+  if (e.key === "Escape") return fermer();
+  if (e.key !== "Tab") return;
+  const focusables = $$("button, a[href], input", modal)
+    .filter((x) => !x.disabled && x.tabIndex >= 0 && !x.closest("[hidden]"));
+  const premier = focusables[0], dernierEl = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === premier) { e.preventDefault(); dernierEl.focus(); }
+  else if (!e.shiftKey && document.activeElement === dernierEl) { e.preventDefault(); premier.focus(); }
+});
+
+// Panneau admin : s'ouvre avec  tonsite/#admin  (aucun lien visible sur le site)
+(() => {
+  const API = "https://api.buttondown.com/v1";
+  const STOCK = "admin_buttondown_cle";
+  const el = (id) => document.getElementById(id);
+  let cle = "";
+  let inscrits = [];
+
+  try { cle = localStorage.getItem(STOCK) || ""; } catch (e) {}
+  el("a-cle").value = cle;
+
+  const message = (id, texte, ok) => {
+    const m = el(id);
+    m.textContent = texte;
+    m.className = "msg " + (ok ? "ok" : "err");
+  };
+  const occupe = (btn, oui) => { btn.disabled = oui; };
+
+  async function api(chemin, options = {}) {
+    let r;
+    try {
+      r = await fetch(API + chemin, {
+        ...options,
+        headers: { "Authorization": "Token " + cle, "Content-Type": "application/json" }
+      });
+    } catch (e) {
+      throw new Error("Connexion impossible : réseau coupé, bloqueur de pub, ou appel refusé par le navigateur. Utilise « Ouvrir Buttondown » pour faire l’action depuis leur site.");
+    }
+    const texte = await r.text();
+    let data; try { data = JSON.parse(texte); } catch (e) { data = texte; }
+    if (!r.ok) {
+      const erreurs = {
+        401: "Clé API refusée (401) : vérifie qu’elle est copiée en entier.",
+        403: "Cette clé n’a pas la permission (403) : donne-lui l’accès aux abonnés et aux e-mails dans Buttondown.",
+        429: "Trop de demandes (429) : attends un instant puis réessaie."
+      };
+      throw new Error(erreurs[r.status] || ("Erreur " + r.status + " : " + (typeof data === "string" ? data : JSON.stringify(data))));
+    }
+    return data;
+  }
+
+
+  // ===== Code d'accès (empreinte PBKDF2, jamais le code en clair) =====
+  const SEL_ORIGINE = "27addf9bd98dc7e3693d1df199c1f2f0";
+  const EMPREINTE_ORIGINE = "89fd3e88c732da1bc25a6bb96c1c188b9b637a18684a86344fa3642d1bae5c4a";
+  const ITERATIONS = 200000;
+  const CLE_CODE = "admin_code_v1"; // code changé par toi, gardé dans ce navigateur
+  let echecs = 0, bloqueJusqua = 0;
+
+  const enc = (t) => new TextEncoder().encode(t);
+  const hex = (o) => [...o].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const pause = () => new Promise((r) => setTimeout(r, 40));
+
+  // --- SHA-256 / PBKDF2 en JavaScript pur (secours quand le navigateur n'a pas crypto.subtle,
+  //     ce qui arrive en ouvrant le fichier sur téléphone ou en http) ---
+  const K = Uint32Array.from([
+    0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const IV = Uint32Array.from([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);
+  const W = new Uint32Array(64);
+
+  function bloc256(etat, mots) {
+    for (let i = 0; i < 16; i++) W[i] = mots[i];
+    for (let i = 16; i < 64; i++) {
+      const a = W[i - 15], b = W[i - 2];
+      const s0 = ((a >>> 7) | (a << 25)) ^ ((a >>> 18) | (a << 14)) ^ (a >>> 3);
+      const s1 = ((b >>> 17) | (b << 15)) ^ ((b >>> 19) | (b << 13)) ^ (b >>> 10);
+      W[i] = (W[i - 16] + s0 + W[i - 7] + s1) | 0;
+    }
+    let a = etat[0], b = etat[1], c = etat[2], d = etat[3], e = etat[4], f = etat[5], g = etat[6], h = etat[7];
+    for (let i = 0; i < 64; i++) {
+      const S1 = ((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7));
+      const t1 = (h + S1 + ((e & f) ^ (~e & g)) + K[i] + W[i]) | 0;
+      const S0 = ((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10));
+      const t2 = (S0 + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    const r = new Uint32Array(8);
+    [a, b, c, d, e, f, g, h].forEach((v, i) => { r[i] = (etat[i] + v) | 0; });
+    return r;
+  }
+  function rembourrer(octets, prefixe) {
+    const n = Math.ceil((octets.length + 9) / 64) * 64;
+    const buf = new Uint8Array(n);
+    buf.set(octets); buf[octets.length] = 0x80;
+    const bits = (prefixe + octets.length) * 8;
+    const dv = new DataView(buf.buffer);
+    dv.setUint32(n - 8, Math.floor(bits / 4294967296)); dv.setUint32(n - 4, bits >>> 0);
+    return buf;
+  }
+  function blocs(etat, buf) {
+    const dv = new DataView(buf.buffer), m = new Uint32Array(16);
+    for (let o = 0; o < buf.length; o += 64) {
+      for (let i = 0; i < 16; i++) m[i] = dv.getUint32(o + i * 4);
+      etat = bloc256(etat, m);
+    }
+    return etat;
+  }
+  function versOctets(etat) {
+    const o = new Uint8Array(32), dv = new DataView(o.buffer);
+    etat.forEach((v, i) => dv.setUint32(i * 4, v));
+    return o;
+  }
+  const sha256 = (octets) => versOctets(blocs(IV, rembourrer(octets, 0)));
+
+  function pbkdf2Js(code, sel, iterations) {
+    let cle = enc(code);
+    if (cle.length > 64) cle = sha256(cle);
+    const k = new Uint8Array(64); k.set(cle);
+    const etatDe = (x) => blocs(IV, k.map((v) => v ^ x));
+    const eInterne = etatDe(0x36), eExterne = etatDe(0x5c);
+    const hmac = (msg) => versOctets(blocs(eExterne, rembourrer(versOctets(blocs(eInterne, rembourrer(msg, 64))), 64)));
+    const graine = enc(sel);
+    const premier = new Uint8Array(graine.length + 4);
+    premier.set(graine); premier[premier.length - 1] = 1;
+    let u = hmac(premier);
+    const total = Uint8Array.from(u);
+    for (let i = 1; i < iterations; i++) {
+      u = hmac(u);
+      for (let j = 0; j < 32; j++) total[j] ^= u[j];
+    }
+    return hex(total);
+  }
+
+  async function empreinte(code, sel) {
+    if (window.crypto && crypto.subtle) {
+      try {
+        const base = await crypto.subtle.importKey("raw", enc(code), "PBKDF2", false, ["deriveBits"]);
+        const bits = await crypto.subtle.deriveBits(
+          { name: "PBKDF2", salt: enc(sel), iterations: ITERATIONS, hash: "SHA-256" }, base, 256);
+        return hex(new Uint8Array(bits));
+      } catch (e) { /* on bascule sur le secours */ }
+    }
+    return pbkdf2Js(code, sel, ITERATIONS);
+  }
+
+  function codeActuel() {
+    try {
+      const o = JSON.parse(localStorage.getItem(CLE_CODE) || "null");
+      if (o && o.s && o.h) return o;
+    } catch (e) {}
+    return { s: SEL_ORIGINE, h: EMPREINTE_ORIGINE };
+  }
+  function selAleatoire() {
+    const o = new Uint8Array(16);
+    if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(o);
+    else o.forEach((_, i) => { o[i] = Math.floor(Math.random() * 256); });
+    return hex(o);
+  }
+
+  const verrouiller = () => {
+    el("a-contenu").hidden = true; el("a-porte").hidden = false;
+    el("a-code").value = ""; el("a-zone").hidden = true;
+    ["a-nouveau", "a-confirme"].forEach((id) => { el(id).value = ""; });
+    ["a-msg-connexion", "a-msg-changer", "a-msg-code"].forEach((id) => { el(id).textContent = ""; el(id).className = "msg"; });
+  };
+
+  // Entrer
+  el("a-porte").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const maintenant = Date.now();
+    if (maintenant < bloqueJusqua) {
+      return message("a-msg-code", "Trop d’essais : attends " + Math.ceil((bloqueJusqua - maintenant) / 1000) + " s.", false);
+    }
+    const bouton = e.submitter || el("a-porte").querySelector("button");
+    const texte = bouton.textContent;
+    bouton.disabled = true; bouton.textContent = "Vérification…";
+    await pause();
+    const stock = codeActuel();
+    let ok = false;
+    try { ok = (await empreinte(el("a-code").value, stock.s)) === stock.h; } catch (err) { ok = false; }
+    bouton.disabled = false; bouton.textContent = texte;
+    if (ok) {
+      echecs = 0; el("a-code").value = "";
+      el("a-porte").hidden = true; el("a-contenu").hidden = false;
+      el("a-msg-code").textContent = ""; el("a-msg-code").className = "msg";
+    } else {
+      echecs++;
+      if (echecs >= 3) { bloqueJusqua = Date.now() + 15000; echecs = 0; }
+      message("a-msg-code", "Code incorrect.", false);
+    }
+  });
+
+  // Changer le code (gardé dans ce navigateur)
+  el("a-changer").addEventListener("click", async (e) => {
+    const n = el("a-nouveau").value, c = el("a-confirme").value;
+    if (n.length < 8) return message("a-msg-changer", "8 caractères minimum.", false);
+    if (n !== c) return message("a-msg-changer", "Les deux codes ne sont pas identiques.", false);
+    const b = e.currentTarget; occupe(b, true);
+    message("a-msg-changer", "Enregistrement…", true);
+    await pause();
+    try {
+      const s = selAleatoire();
+      const h = await empreinte(n, s);
+      localStorage.setItem(CLE_CODE, JSON.stringify({ s, h }));
+      if (!localStorage.getItem(CLE_CODE)) throw new Error("stockage");
+      el("a-nouveau").value = ""; el("a-confirme").value = "";
+      message("a-msg-changer", "Code changé ✅ — il sera demandé à la prochaine ouverture.", true);
+    } catch (err) {
+      message("a-msg-changer", "Impossible d’enregistrer le code : ce navigateur bloque le stockage.", false);
+    }
+    occupe(b, false);
+  });
+  el("a-reinit").addEventListener("click", () => {
+    try { localStorage.removeItem(CLE_CODE); } catch (e) {}
+    message("a-msg-changer", "Code d’origine rétabli ✅", true);
+  });
+
+  // Reverrouillage à chaque fermeture de la fenêtre
+  new MutationObserver(() => {
+    if (!el("modal-admin").classList.contains("ouvert")) verrouiller();
+  }).observe(el("modal-admin"), { attributes: true, attributeFilter: ["class"] });
+
+  // Connexion
+  el("a-connexion").addEventListener("click", async (e) => {
+    cle = el("a-cle").value.trim();
+    if (!cle) return message("a-msg-connexion", "Colle d’abord ta clé API.", false);
+    const b = e.currentTarget; occupe(b, true);
+    try {
+      const d = await api("/subscribers");
+      try { localStorage.setItem(STOCK, cle); } catch (err) {}
+      el("a-nombre").textContent = d.count ?? (d.results ? d.results.length : "?");
+      el("a-zone").hidden = false;
+      message("a-msg-connexion", "Connecté ✅", true);
+    } catch (err) {
+      el("a-zone").hidden = true;
+      message("a-msg-connexion", err.message, false);
+    }
+    occupe(b, false);
+  });
+
+  el("a-oublier").addEventListener("click", () => {
+    try { localStorage.removeItem(STOCK); } catch (e) {}
+    cle = ""; el("a-cle").value = ""; el("a-zone").hidden = true; inscrits = [];
+    message("a-msg-connexion", "Clé oubliée sur ce navigateur.", true);
+  });
+
+  // Liste des inscrits
+  function afficher(filtre = "") {
+    const liste = el("a-liste");
+    liste.replaceChildren();
+    const table = document.createElement("table");
+    const tete = table.createTHead().insertRow();
+    ["E-mail", "Statut", "Date"].forEach((t) => {
+      const th = document.createElement("th"); th.textContent = t; tete.appendChild(th);
+    });
+    const corps = table.createTBody();
+    inscrits
+      .filter((s) => (s.email_address || s.email || "").toLowerCase().includes(filtre.toLowerCase()))
+      .forEach((s) => {
+        const tr = corps.insertRow();
+        tr.insertCell().textContent = s.email_address || s.email || "?";
+        tr.insertCell().textContent = s.type || s.status || "";
+        tr.insertCell().textContent = (s.creation_date || "").slice(0, 10);
+      });
+    liste.appendChild(table);
+  }
+
+  el("a-liste-btn").addEventListener("click", async (e) => {
+    const b = e.currentTarget; occupe(b, true);
+    try {
+      inscrits = [];
+      let url = "/subscribers", pages = 0;
+      while (url && pages < 10) {
+        const d = await api(url);
+        inscrits.push(...(d.results || []));
+        el("a-nombre").textContent = d.count ?? inscrits.length;
+        if (d.next) { const u = new URL(d.next); url = u.pathname.replace(/^\/v1/, "") + u.search; }
+        else url = null;
+        pages++;
+      }
+      el("a-liste").hidden = false; el("a-recherche").hidden = false;
+      afficher(el("a-recherche").value);
+      message("a-msg-liste", inscrits.length + " adresse(s) chargée(s).", true);
+    } catch (err) { message("a-msg-liste", err.message, false); }
+    occupe(b, false);
+  });
+  el("a-recherche").addEventListener("input", (e) => afficher(e.target.value));
+
+  // Envoi d'e-mail
+  async function creer(statut, btn) {
+    const sujet = el("a-sujet").value.trim(), corps = el("a-corps").value.trim();
+    if (!sujet || !corps) return message("a-msg-envoi", "Écris un objet et un message.", false);
+    if (statut === "about_to_send" &&
+        !confirm("Envoyer cet e-mail à TOUS les inscrits (" + el("a-nombre").textContent + ") ?\nCette action est définitive.")) return;
+    occupe(btn, true);
+    try {
+      await api("/emails", { method: "POST", body: JSON.stringify({ subject: sujet, body: corps, status: statut }) });
+      message("a-msg-envoi", statut === "draft"
+        ? "Brouillon créé ✅ — retrouve-le dans Buttondown, menu Emails."
+        : "Envoi lancé ✅ — suis-le dans Buttondown, menu Emails.", true);
+    } catch (err) { message("a-msg-envoi", err.message, false); }
+    occupe(btn, false);
+  }
+  el("a-brouillon").addEventListener("click", (e) => creer("draft", e.currentTarget));
+  el("a-envoyer").addEventListener("click", (e) => creer("about_to_send", e.currentTarget));
+
+  // Ouverture par l'adresse  …/#admin
+  const verifier = () => { if (location.hash === "#admin") ouvrir("modal-admin"); };
+  verifier();
+  addEventListener("hashchange", verifier);
+})();
+</script>
+</body>
+</html>
